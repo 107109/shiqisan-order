@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>十七黔三 · 欢迎点单</title>
+<style>
+/* ============ 基础（套自模板 text_defaults） ============ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Microsoft YaHei","PingFang SC","Segoe UI",sans-serif;
+  color:#111;line-height:1.6;
+  /* 星空壁纸 */
+  background:url("bg.jpg") center/cover no-repeat fixed #0a1a3a;
+}
+/* 壁纸上的柔光罩，保证可读性 */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.10),rgba(6,16,40,.28) 75%);
+}
+a{color:#111}
+
+.wrap{max-width:760px;margin:0 auto;padding:0 14px 120px;position:relative;z-index:1}
+
+/* ============ 头部（黑框 + 花体字团名） ============ */
+.topbar{height:34px;background:#111;margin:0 -14px}
+header{position:relative;margin-top:18px}
+.frame{
+  position:relative;border:5px solid #111;border-radius:26px;background:#fff;
+  padding:48px 18px 36px;overflow:hidden;text-align:center;
+  box-shadow:0 0 0 3px #fff,0 0 0 5px #111,8px 10px 0 rgba(0,0,0,.35);
+}
+.leaf{position:absolute;right:-26px;top:22px;width:118px;transform:rotate(18deg);opacity:.9}
+.script{
+  position:relative;text-align:center;
+  font-family:"Segoe Script","Brush Script MT","Lucida Handwriting",cursive;
+  font-size:clamp(30px,6.5vw,54px);color:#111;line-height:1.1;
+  transform:rotate(-3deg);user-select:none;
+}
+.club{
+  display:block;width:max-content;margin:10px auto 0;background:#111;color:#fff;
+  border-radius:999px;padding:8px 42px;font-size:19px;font-weight:700;letter-spacing:4px;
+}
+.welcome{
+  display:block;width:max-content;margin:8px auto 0;font-size:13px;font-weight:700;
+  letter-spacing:8px;color:#111;
+}
+.tagline{
+  display:block;width:max-content;margin:16px auto 0;font-size:11px;color:#666;
+  letter-spacing:3px;
+}
+.tagline::before,.tagline::after{content:"———";color:#bbb;margin:0 10px;letter-spacing:0}
+
+/* ============ 链接式导航 + 搜索（整体吸顶） ============ */
+.stickyhead{position:sticky;top:0;z-index:20;margin:22px -14px 0}
+nav.quick{
+  background:#111;
+  display:flex;flex-wrap:wrap;justify-content:center;gap:2px 0;
+  border-top:3px solid #fff;
+}
+nav.quick a{
+  color:#fff;text-decoration:none;font-size:13px;padding:9px 13px;letter-spacing:1px;
+  border-bottom:2px dotted transparent;
+}
+nav.quick a:hover{background:#fff;color:#111}
+nav.quick a::before{content:"· "}
+/* 搜索框 */
+.searchbar{
+  display:flex;align-items:center;gap:8px;background:#fff;
+  border:3px solid #111;border-top:none;padding:7px 12px;
+}
+.searchbar svg{flex:none;width:15px;height:15px}
+.searchbar input{
+  flex:1;border:none;outline:none;background:transparent;
+  font-size:14px;font-family:inherit;color:#111;
+}
+.searchbar .clr{
+  flex:none;border:none;background:#111;color:#fff;border-radius:999px;
+  width:20px;height:20px;font-size:11px;line-height:1;cursor:pointer;display:none;
+}
+.searchbar .clr.on{display:block}
+.nohit{
+  display:none;margin-top:26px;text-align:center;color:#fff;font-size:13px;
+  letter-spacing:2px;text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
+.nohit.on{display:block}
+
+/* ============ 分区（套用模板 .product + 隐藏 checkbox 折叠结构） ============ */
+.product{margin:34px 0 0}
+.product>input.toggle{position:absolute;opacity:0;pointer-events:none}
+label.show{
+  display:flex;align-items:center;justify-content:center;gap:14px;cursor:pointer;
+  user-select:none;
+}
+label.show .t{font-size:20px;font-weight:700;letter-spacing:3px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+label.show .bar{width:90px;height:5px;background:#111;box-shadow:0 0 0 1px #fff}
+label.show .arrow{font-size:12px;transition:transform .2s;color:#fff}
+.product>input.toggle:checked ~ label.show .arrow{transform:rotate(180deg)}
+.license{display:none;padding-top:16px}
+.product>input.toggle:checked ~ .license{display:block}
+.sub{font-size:12px;color:#fff;text-align:center;margin-bottom:10px;text-shadow:0 1px 4px rgba(0,0,0,.7)}
+.sub2{margin:16px 0 6px;font-size:13px;font-weight:700;letter-spacing:2px;text-align:center;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7)}
+.sub2::before,.sub2::after{content:"———";color:#ccc;font-weight:400;margin:0 8px}
+
+/* ============ 可直点条目 ============ */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.chip{
+  border:2px solid #111;background:#fff;padding:10px 12px;cursor:pointer;
+  display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  font-size:14px;transition:all .12s;position:relative;user-select:none;
+}
+.chip .p{font-weight:700;white-space:nowrap}
+.chip:hover{background:#111;color:#fff}
+.chip.sel{background:#111;color:#fff;box-shadow:4px 4px 0 rgba(255,255,255,.55)}
+.chip.sel::after{
+  content:attr(data-qty);position:absolute;top:-9px;right:-9px;min-width:20px;height:20px;
+  background:#fff;color:#111;border:2px solid #111;border-radius:50%;
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
+}
+/* 团内业务：可点击，弹窗自拟价格 */
+.biz{
+  border:2px solid #111;background:rgba(255,255,255,.92);padding:10px 12px;
+  font-size:14px;display:flex;align-items:center;gap:8px;user-select:none;
+  cursor:pointer;transition:all .12s;
+}
+.biz b{font-size:12px;color:#666}
+.biz:hover{background:#111;color:#fff}
+.biz:hover b{color:#ffd83d}
+.biz .tag{
+  margin-left:auto;font-size:10px;border:1px dashed currentColor;border-radius:999px;
+  padding:1px 8px;opacity:.75;white-space:nowrap;
+}
+
+/* 自拟价格弹窗 */
+.pmask{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.pmask.on{display:flex}
+.pcard{
+  background:#fff;border:4px solid #111;border-radius:16px;padding:22px 20px 18px;
+  width:min(360px,100%);text-align:center;box-shadow:8px 10px 0 rgba(0,0,0,.35);
+}
+.pcard .pt{font-size:17px;font-weight:700;letter-spacing:2px}
+.pcard .ps{font-size:12px;color:#777;margin:6px 0 12px}
+.pcard input{
+  width:100%;border:2px solid #111;padding:11px;font-size:16px;outline:none;
+  text-align:center;font-family:inherit;background:#fafafa;
+}
+.pcard input:focus{background:#fff;box-shadow:3px 3px 0 rgba(0,0,0,.15)}
+.pcard .pb{display:flex;gap:10px;margin-top:14px}
+.pcard .pb button{flex:1;padding:11px;font-size:14px;font-weight:700;border:2px solid #111;cursor:pointer;letter-spacing:2px}
+.pcard .pb .ok{background:#111;color:#fff}
+.pcard .pb .no{background:#fff;color:#111}
+
+/* 自定义表单 */
+.giftform{display:flex;gap:10px;flex-wrap:wrap}
+.giftform input{
+  flex:1;min-width:130px;border:2px solid #111;background:#fff;padding:11px 12px;
+  font-size:14px;font-family:inherit;outline:none;
+}
+.giftform input:focus{background:#fafafa;box-shadow:3px 3px 0 rgba(255,255,255,.5)}
+.giftform button{
+  border:2px solid #111;background:#111;color:#fff;padding:11px 22px;
+  font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px;white-space:nowrap;
+}
+.giftform button:hover{background:#fff;color:#111}
+
+/* 静态文本框（需知） */
+.box{border:2px solid #111;background:rgba(255,255,255,.95);padding:14px 16px;font-size:13px}
+.box ol,.box ul{padding-left:20px}
+.box li{margin-bottom:8px}
+.box .warn{
+  display:flex;gap:10px;align-items:flex-start;background:#111;color:#fff;
+  padding:12px 14px;font-size:14px;font-weight:700;margin-bottom:12px;letter-spacing:1px;
+}
+.box .warn .ic{
+  flex:none;width:22px;height:22px;background:#ffd83d;color:#111;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+
+.foot{
+  margin:40px -14px 0;background:#111;color:#fff;text-align:center;padding:16px 12px 20px;
+  font-size:11px;letter-spacing:2px;
+}
+.foot .nh{font-weight:700;letter-spacing:6px;margin-bottom:6px}
+.foot small{display:block;color:#aaa;letter-spacing:1px;margin-top:6px;line-height:1.7}
+
+/* ============ 底部购物车浮条 ============ */
+.cartbar{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:50;
+  width:min(720px,calc(100% - 24px));background:#111;color:#fff;border-radius:14px;
+  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer;border:2px solid #fff;
+}
+.cartbar .cnt{background:#fff;color:#111;border-radius:999px;padding:2px 10px;font-weight:700;font-size:13px}
+.cartbar .total{margin-left:auto;font-weight:700;font-size:17px}
+.cartbar .go{background:#fff;color:#111;border:none;padding:7px 18px;font-weight:700;cursor:pointer;border-radius:8px}
+
+/* 订单弹层 */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:60;display:none}
+.mask.on{display:block}
+.panel{
+  position:fixed;left:50%;bottom:0;transform:translateX(-50%);z-index:61;
+  width:min(720px,100%);max-height:82vh;overflow:auto;background:#fff;
+  border:4px solid #111;border-bottom:none;border-radius:18px 18px 0 0;padding:18px;
+  display:none;
+}
+.panel.on{display:block}
+.panel h3{text-align:center;letter-spacing:4px;margin-bottom:4px}
+.panel .ph-sub{text-align:center;font-size:11px;color:#888;margin-bottom:14px}
+.orow{display:flex;align-items:center;gap:10px;border-bottom:1px dotted #999;padding:9px 2px;font-size:14px}
+.orow .nm{flex:1}
+.orow .pr{font-weight:700;min-width:64px;text-align:right}
+.orow.feerow{color:#8a6d00;font-weight:700}
+.qbtn{width:26px;height:26px;border:2px solid #111;background:#fff;font-weight:700;cursor:pointer;line-height:1}
+.qbtn:hover{background:#111;color:#fff}
+.ototal{display:flex;justify-content:space-between;padding:14px 2px 6px;font-size:18px;font-weight:700}
+textarea.remark{
+  width:100%;border:2px solid #111;padding:10px;font-size:13px;font-family:inherit;
+  margin:8px 0 14px;min-height:64px;resize:vertical;background:#fafafa;
+}
+.pbtns{display:flex;gap:10px}
+.pbtns button{flex:1;padding:12px;font-size:15px;font-weight:700;cursor:pointer;border:2px solid #111;letter-spacing:2px}
+.pbtns .primary{background:#111;color:#fff}
+.pbtns .ghost{background:#fff;color:#111}
+
+/* toast */
+.toast{
+  position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:99;
+  background:#111;color:#fff;padding:10px 22px;border-radius:999px;font-size:14px;
+  opacity:0;pointer-events:none;transition:opacity .25s;border:2px solid #fff;
+}
+.toast.on{opacity:1}
+@media (max-width:480px){
+  .leaf{width:92px;top:26px}
+  .grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar"></div>
+
+  <!-- ================= 头部 ================= -->
+  <header>
+    <div class="frame">
+      <svg class="leaf" viewBox="0 0 100 100" fill="#111" aria-hidden="true">
+        <path d="M50 2 L58 18 L76 8 L71 28 L96 24 L79 42 L100 50 L79 58 L90 82 L66 73 L63 97 L50 79 L37 97 L34 73 L10 82 L21 58 L0 50 L21 42 L4 24 L29 28 L24 8 L42 18 Z"/>
+        <rect x="47" y="76" width="6" height="24" rx="3"/>
+      </svg>
+      <div class="script">Seventeen Qian Three</div>
+      <span class="club">十七黔三</span>
+      <span class="welcome">欢 迎 点 单</span>
+      <span class="tagline">点 击 菜 品 · 一 键 下 单</span>
+    </div>
+  </header>
+
+  <!-- ================= 链接式导航 + 搜索 ================= -->
+  <div class="stickyhead" id="top">
+    <nav class="quick">
+      <a href="#sec-xuzhi">点单需知</a>
+      <a href="#sec-peiwang">陪玩区</a>
+      <a href="#sec-tuan">多人团</a>
+      <a href="#sec-zhiding">指定加价</a>
+      <a href="#sec-yewu">团内业务</a>
+      <a href="#sec-custom">自定义</a>
+    </nav>
+    <div class="searchbar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="searchInput" type="search" placeholder="搜索关键词，如：虐恋 / 塔罗 / 半小时……" autocomplete="off">
+      <button class="clr" id="searchClear" type="button" aria-label="清除">×</button>
+    </div>
+  </div>
+
+  <!-- 菜单分区由 JS 按模板结构渲染 -->
+  <main id="menu"></main>
+  <div class="nohit" id="noHit">— 没有找到相关项目，换个关键词试试 —</div>
+
+  <!-- ================= 页脚 ================= -->
+  <div class="foot">
+    <div class="nh">NOW HIRING</div>
+    <span>· 十七黔三 长期招新中 ·</span>
+    <small>如若有另外需求欢迎宝子提出，我们会考虑添加。<br>最终解释权归十七黔三所有。</small>
+  </div>
+</div>
+
+<!-- ================= 购物车浮条 ================= -->
+<div class="cartbar" id="cartbar">
+  <span class="cnt" id="cartCnt">0</span>
+  <span>已选项目</span>
+  <span class="total" id="cartTotal">¥0</span>
+  <button class="go" id="openPanel">查看订单</button>
+</div>
+
+<!-- ================= 订单弹层 ================= -->
+<div class="mask" id="mask"></div>
+<div class="panel" id="panel">
+  <h3>订 单 确 认</h3>
+  <div class="ph-sub">十七黔三 · 核对无误后一键复制，发给派单即可</div>
+  <div id="orderList"></div>
+  <div class="ototal"><span>合计</span><span id="orderTotal">¥0</span></div>
+  <textarea class="remark" id="remark" placeholder="备注：板卡 / 雷点 / 指定陪陪 / 指定装扮等，请在此填写……"></textarea>
+  <div class="pbtns">
+    <button class="primary" id="copyOrder">一键复制订单</button>
+    <button class="ghost" id="clearCart">清空</button>
+    <button class="ghost" id="closePanel">收起</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ================= 团内业务：自拟价格弹窗 ================= -->
+<div class="pmask" id="pmask">
+  <div class="pcard">
+    <div class="pt" id="pTitle">团内业务</div>
+    <div class="ps">该业务价格面议，请输入您想支付的金额</div>
+    <input id="pInput" type="number" min="0" step="0.01" placeholder="金额（r）" inputmode="decimal">
+    <div class="pb">
+      <button class="ok" id="pOk" type="button">加入订单</button>
+      <button class="no" id="pCancel" type="button">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==================== 菜单数据（按图片录入，斜杠项已拆分为独立菜品） ==================== */
+const SECTIONS=[
+ {id:"sec-peiwang",title:"陪玩区",sub:"点陪玩需另付派单费 2r（订单内已自动计入）",type:"grid",fee:true,items:[
+  {n:"虐恋 · 半小时",p:12},{n:"虐恋 · 一小时",p:23},
+  {n:"病恋 · 半小时",p:12},{n:"病恋 · 一小时",p:23},
+  {n:"虚恋 · 半小时",p:11},{n:"虚恋 · 一小时",p:22},
+  {n:"话唠 · 半小时",p:11},{n:"话唠 · 一小时",p:22},
+  {n:"树洞 · 半小时",p:9},{n:"树洞 · 一小时",p:18},
+  {n:"搞笑 · 半小时",p:9},{n:"搞笑 · 一小时",p:18},
+  {n:"普陪 · 半小时",p:8},{n:"普陪 · 一小时",p:16},
+  {n:"盲盒 · 半小时",p:8},{n:"盲盒 · 一小时",p:16}]},
+ {id:"sec-tuan",title:"多人团",sub:"自选陪陪 · 按人数计费",type:"grid",fee:true,items:[
+  {n:"两人团自选 · 半小时",p:22},{n:"两人团自选 · 一小时",p:44},
+  {n:"三人团自选 · 半小时",p:33},{n:"三人团自选 · 一小时",p:66}]},
+ {id:"sec-zhiding",title:"指定加价",sub:"打赏陪玩无抽成",type:"grid",items:[
+  {n:"指定陪玩",p:3,u:"加价"},{n:"指定装扮",p:2,u:"加价"}]}
+];
+
+/* 团内业务（可点击，自拟价格加入订单） */
+const BIZ=["光遇陪玩","陪聊语聊","塔罗占卜","手相面相","代写文案","故事代写","心理咨询","滤镜修图","真实分享","文字代骂"];
+
+/* ==================== 渲染（套用模板 .product / label.show / .license 结构） ==================== */
+const fmt=v=>{let s=(Math.round(v*100)/100).toString();return s};
+const menu=document.getElementById("menu");
+let html="";
+
+/* 点单需知（静态，默认展开） */
+html+='<section class="product" id="sec-xuzhi">'
+ +'<input type="checkbox" class="toggle" id="tg-xuzhi" checked>'
+ +'<label class="show" for="tg-xuzhi" tabindex="0"><span class="bar"></span><span class="t">- 点单需知 -</span><span class="bar"></span><span class="arrow">&#9660;</span></label>'
+ +'<div class="license"><div class="box">'
+ +'<div class="warn"><span class="ic">!</span><span>点单需知：下单后需要给派单支付派单费 2r（只有点陪玩需要给派单费用！）</span></div>'
+ +'<ul>'
+ +'<li>其他业务价格都可以联系派单咨询！！！</li>'
+ +'<li>当然要是喜欢的话，也可以打赏派单 ❤</li>'
+ +'<li>打赏陪玩无抽成。</li>'
+ +'<li>如若有另外需求，欢迎宝子提出！我们会考虑添加。</li>'
+ +'</ul></div></div></section>';
+
+SECTIONS.forEach((sec,i)=>{
+  html+='<section class="product" id="'+sec.id+'">'
+    +'<input type="checkbox" class="toggle" id="tg-'+sec.id+'" checked>'
+    +'<label class="show" for="tg-'+sec.id+'" tabindex="0"><span class="bar"></span>'
+    +'<span class="t">- '+sec.title+' -</span><span class="bar"></span>'
+    +'<span class="arrow">&#9660;</span></label>'
+    +'<div class="license">';
+  if(sec.sub)html+='<div class="sub">'+sec.sub+'</div>';
+  const chip=it=>'<div class="chip" data-n="'+it.n+'" data-p="'+it.p+'"'+(sec.fee?' data-fee="1"':"")+'><span>'+it.n+'</span><span class="p">'+fmt(it.p)+'r'+(it.u&&it.u[0]==="/"?it.u:"")+'</span></div>';
+  html+='<div class="grid">'+sec.items.map(chip).join("")+'</div>';
+  html+='</div></section>';
+});
+
+/* 团内业务（点击自拟价格） */
+html+='<section class="product" id="sec-yewu">'
+ +'<input type="checkbox" class="toggle" id="tg-yewu" checked>'
+ +'<label class="show" for="tg-yewu" tabindex="0"><span class="bar"></span><span class="t">- 团内业务 -</span><span class="bar"></span><span class="arrow">&#9660;</span></label>'
+ +'<div class="license"><div class="sub">点击任意业务，可自拟价格加入订单（最终价格以派单确认为准）</div><div class="grid">'
+ +BIZ.map((b,i)=>'<div class="biz" data-biz="'+b+'"><b>'+(i+1)+'.</b><span>'+b+'</span><span class="tag">自定义价</span></div>').join("")
+ +'</div></div></section>';
+
+/* 自定义（其他需求，自行填写） */
+html+='<section class="product" id="sec-custom">'
+ +'<input type="checkbox" class="toggle" id="tg-custom" checked>'
+ +'<label class="show" for="tg-custom" tabindex="0"><span class="bar"></span><span class="t">- 自定义 -</span><span class="bar"></span><span class="arrow">&#9660;</span></label>'
+ +'<div class="license"><div class="sub">有其他需求？自行填写名称与金额后加入订单</div>'
+ +'<div class="giftform">'
+ +'<input id="giftName" type="text" placeholder="项目名称（自定义）">'
+ +'<input id="giftPrice" type="number" min="0" step="0.01" placeholder="金额（r）">'
+ +'<button id="giftAdd" type="button">＋ 加入订单</button>'
+ +'</div></div></section>';
+
+menu.innerHTML=html;
+
+/* ==================== 购物车逻辑 ==================== */
+const cart={}; /* name -> {p, qty, fee} */
+const FEE=2; /* 派单费：点陪玩类项目时收取 */
+const toast=document.getElementById("toast");
+let toastTimer=null;
+function showToast(msg){
+  toast.textContent=msg;toast.classList.add("on");
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove("on"),1600);
+}
+function hasFee(){
+  for(const k in cart)if(cart[k].fee)return true;
+  return false;
+}
+function calcTotal(){
+  let total=0;for(const k in cart)total+=cart[k].qty*cart[k].p;
+  if(hasFee())total+=FEE;
+  return total;
+}
+function refresh(){
+  let cnt=0;
+  for(const k in cart)cnt+=cart[k].qty;
+  document.getElementById("cartCnt").textContent=cnt;
+  document.getElementById("cartTotal").textContent="¥"+fmt(calcTotal());
+  document.querySelectorAll("[data-n]").forEach(el=>{
+    const it=cart[el.dataset.n];
+    if(it){el.classList.add("sel");el.dataset.qty="x"+it.qty}
+    else{el.classList.remove("sel");el.removeAttribute("data-qty")}
+  });
+  renderOrder();
+}
+function renderOrder(){
+  const list=document.getElementById("orderList");
+  const keys=Object.keys(cart);
+  if(!keys.length){list.innerHTML='<div style="text-align:center;color:#999;padding:20px 0;font-size:13px">还没有选择项目，点击菜单即可加入～</div>'}
+  else{
+    list.innerHTML=keys.map(k=>{
+      const it=cart[k];
+      return '<div class="orow"><span class="nm">'+k+'</span>'
+        +'<button class="qbtn" data-dec="'+k+'">-</button>'
+        +'<span style="min-width:28px;text-align:center">'+it.qty+'</span>'
+        +'<button class="qbtn" data-inc="'+k+'">+</button>'
+        +'<span class="pr">'+fmt(it.qty*it.p)+'r</span></div>';
+    }).join("")+(hasFee()?'<div class="orow feerow"><span class="nm">派单费（点陪玩）</span><span class="pr">'+FEE+'r</span></div>':"");
+  }
+  document.getElementById("orderTotal").textContent="¥"+fmt(calcTotal());
+}
+/* 点击条目（事件委托） */
+document.addEventListener("click",e=>{
+  const item=e.target.closest(".chip");
+  if(item){
+    const n=item.dataset.n,p=parseFloat(item.dataset.p);
+    if(cart[n])cart[n].qty++;else cart[n]={p:p,qty:1,fee:item.dataset.fee==="1"};
+    refresh();showToast("已加入："+n);
+    return;
+  }
+  const biz=e.target.closest(".biz");
+  if(biz){openPriceModal(biz.dataset.biz);return}
+  const dec=e.target.closest("[data-dec]");
+  if(dec){const k=dec.dataset.dec;cart[k].qty--;if(cart[k].qty<=0)delete cart[k];refresh();return}
+  const inc=e.target.closest("[data-inc]");
+  if(inc){cart[inc.dataset.inc].qty++;refresh();return}
+});
+/* 团内业务：自拟价格弹窗 */
+const pmask=document.getElementById("pmask"),pInput=document.getElementById("pInput");
+let pendingBiz="";
+function openPriceModal(name){
+  pendingBiz=name;
+  document.getElementById("pTitle").textContent=name;
+  pInput.value="";
+  pmask.classList.add("on");
+  setTimeout(()=>pInput.focus(),60);
+}
+function closePriceModal(){pmask.classList.remove("on");pendingBiz=""}
+document.getElementById("pCancel").addEventListener("click",closePriceModal);
+pmask.addEventListener("click",e=>{if(e.target===pmask)closePriceModal()});
+pInput.addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("pOk").click()});
+document.getElementById("pOk").addEventListener("click",()=>{
+  const p=parseFloat(pInput.value);
+  if(!(p>0)){showToast("请输入有效金额");pInput.focus();return}
+  let key=pendingBiz;
+  if(cart[key]&&cart[key].p!==p)key=pendingBiz+" · "+fmt(p)+"r";
+  if(cart[key])cart[key].qty++;else cart[key]={p:p,qty:1,fee:false};
+  refresh();showToast("已加入："+pendingBiz+"（"+fmt(p)+"r）");
+  closePriceModal();
+});
+/* 搜索关键词过滤 */
+const searchInput=document.getElementById("searchInput"),searchClear=document.getElementById("searchClear"),noHit=document.getElementById("noHit");
+function applySearch(){
+  const q=searchInput.value.trim().toLowerCase();
+  searchClear.classList.toggle("on",!!q);
+  let anyVisible=false;
+  document.querySelectorAll("#menu .product").forEach(sec=>{
+    const items=sec.querySelectorAll(".chip,.biz");
+    if(!items.length){ /* 需知、自定义等无条目分区：搜索时隐藏 */
+      sec.style.display=q?"none":"";
+      return;
+    }
+    let shown=0;
+    items.forEach(el=>{
+      const name=(el.dataset.n||el.dataset.biz||"").toLowerCase();
+      const hit=!q||name.indexOf(q)>-1;
+      el.style.display=hit?"":"none";
+      if(hit)shown++;
+    });
+    sec.style.display=shown?"":"none";
+    if(shown)anyVisible=true;
+    /* 搜索时自动展开命中的分区 */
+    if(q&&shown){const tg=sec.querySelector("input.toggle");if(tg)tg.checked=true}
+  });
+  noHit.classList.toggle("on",!!q&&!anyVisible);
+}
+searchInput.addEventListener("input",applySearch);
+searchClear.addEventListener("click",()=>{searchInput.value="";applySearch();searchInput.focus()});
+/* 弹层 */
+const mask=document.getElementById("mask"),panel=document.getElementById("panel");
+function openPanel(){renderOrder();mask.classList.add("on");panel.classList.add("on")}
+function closePanel(){mask.classList.remove("on");panel.classList.remove("on")}
+document.getElementById("cartbar").addEventListener("click",openPanel);
+document.getElementById("closePanel").addEventListener("click",closePanel);
+mask.addEventListener("click",closePanel);
+document.getElementById("clearCart").addEventListener("click",()=>{
+  for(const k in cart)delete cart[k];refresh();showToast("已清空");
+});
+/* 自定义：填写名称与金额后加入订单 */
+document.getElementById("giftAdd").addEventListener("click",()=>{
+  const n=document.getElementById("giftName").value.trim();
+  const p=parseFloat(document.getElementById("giftPrice").value);
+  if(!n||!(p>0)){showToast("请填写项目名称和金额");return}
+  if(cart[n])cart[n].qty++;else cart[n]={p:p,qty:1,fee:false};
+  document.getElementById("giftName").value="";
+  document.getElementById("giftPrice").value="";
+  refresh();showToast("已加入："+n);
+});
+/* 复制 */
+function copyText(text,msg){
+  const done=()=>showToast(msg||"已复制");
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallback());
+  }else fallback();
+  function fallback(){
+    const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);
+    ta.select();try{document.execCommand("copy");done()}catch(err){showToast("复制失败，请手动选择")}
+    document.body.removeChild(ta);
+  }
+}
+document.getElementById("copyOrder").addEventListener("click",()=>{
+  const keys=Object.keys(cart);
+  if(!keys.length){showToast("请先选择项目");return}
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,"0");
+  const orderNo="SQQS"+now.getFullYear()+pad(now.getMonth()+1)+pad(now.getDate())+"-"+Math.floor(1000+Math.random()*9000);
+  const timeStr=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate())+" "+pad(now.getHours())+":"+pad(now.getMinutes());
+  let lines=["【十七黔三 · 点单】","单号："+orderNo,"规格："];
+  keys.forEach(k=>{const it=cart[k];lines.push("· "+k+" x"+it.qty+" — "+fmt(it.qty*it.p)+"r")});
+  if(hasFee())lines.push("· 派单费 — "+FEE+"r");
+  const rm=document.getElementById("remark").value.trim();
+  lines.push("备注："+(rm||"无"));
+  lines.push("合计："+fmt(calcTotal())+"r");
+  lines.push("时间："+timeStr);
+  copyText(lines.join("\n"),"订单已复制，发给派单即可");
+});
+refresh();
+</script>
+</body>
+</html>
